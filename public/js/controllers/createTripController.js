@@ -8,7 +8,8 @@ angular.module('app.create', ['app.services','firebase', 'uiGmapgoogle-maps'])
   // $scope.formCompleted is a variable to determine if the form is completed
   // if it's false, the form with show
   // if true, the form will hide and the right side of page will populate
-  $scope.userId = $window.localStorage.getItem('EQUIP_TOKEN')
+  $scope.userId = $window.localStorage.getItem('EQUIP_TOKEN');
+  console.log($scope.userId, "idddddddddddddd");
   $scope.userInfo = {};
   $scope.formCompleted = false;
   $scope.topLevelCompleted = false;
@@ -19,7 +20,7 @@ angular.module('app.create', ['app.services','firebase', 'uiGmapgoogle-maps'])
 
 
   //redirect if user isn't validated
-  if (!window.localStorage.EQUIP_TOKEN) {
+  if (!$window.localStorage.EQUIP_TOKEN) {
     $location.path('#/signin');
   }
   

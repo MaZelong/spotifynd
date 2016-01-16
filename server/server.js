@@ -5,6 +5,7 @@ var path = require('path');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var session = require('express-session');
+var User = require('./models/users');
 
 
 
@@ -42,12 +43,29 @@ passport.use(new FacebookStrategy({
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
     process.nextTick(function () {
-      
+      User.findOne({'username': profile.displayName}, function(err, user){
+        if(err)
+          return done(err);
+        if(user)
+          return done(null, user);
+        else {
+          var newUser = new User();
+          newUser.username = profile.displayName;
+          newUser.password = profile.id;
+
+          newUser.save(function(err){
+            if(err)
+              throw err;
+            return done(null, newUser);
+          })
+          console.log(profile);
+        }
+      });
       // To keep the example simple, the user's Facebook profile is returned to
       // represent the logged-in user.  In a typical application, you would want
       // to associate the Facebook account with a user record in your database,
       // and return that user instead.
-      return done(null, profile);
+      //return done(null, profile);
     });
   }
 ));
@@ -93,7 +111,9 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback', 
   passport.authenticate('facebook', { failureRedirect: '/api/login' }),
   function(req, res) {
-    res.redirect('/');
+    //console.log('----------');
+    //console.log(req.user);
+    res.redirect('/#/signin');
   });
 
 // app.get('/logout', function(req, res){

@@ -45,21 +45,51 @@ module.exports = {
   login : function(req, res, next) {
     var username = req.body.username;
     var password = req.body.password;
-
-    findUser({username: username})
-      .then(function (user) {
+    var faceBookLogin = req.body.facebook;
+    if (faceBookLogin && !username) {
+      console.log("in the login HHHHHHHHHHHHHHHHH");
+      console.log(req.session.passport.user._id, "sessionStore");
+      var fbName = req.session.passport.user.username;
+      var fbPassword = req.session.passport.user.password;
+      console.log(typeof fbName);
+      findUser({username: fbName})
+        .then(function (user) {
         if (!user) {
           next(new Error('User does not exist'));
         }
-        user.comparePasswords(password)
-          .then(function (match) {
-            if (match) {
-              res.send({id: user._id});
-            } else {
-              res.send({error: 'wrong password'});
-            }
-          })
-      })
+        console.log(user, "user");
+        res.send({id: user._id});
+
+        // user.comparePasswords(fbPassword)
+        //   .then(function (match) {
+        //     if (match) {
+        //       console.log("true");
+        //     } else {
+        //       res.send({error: 'wrong password'});
+        //     }
+        //   })
+        });
+      // console.log(req.sessionStore, "sessionStore");
+      // console.log(req.sessionStore, "sessionStore");
+      // console.log(req.sessionStore, "sessionStore");
+
+    }
+    else if (!faceBookLogin&&(!!username)&&(!!password)) {
+      findUser({username: username})
+        .then(function (user) {
+          if (!user) {
+            next(new Error('User does not exist'));
+          }
+          user.comparePasswords(password)
+            .then(function (match) {
+              if (match) {
+                res.send({id: user._id});
+              } else {
+                res.send({error: 'wrong password'});
+              }
+            })
+        });
+    }
   },
 
   logout : function(req, res, next) {
