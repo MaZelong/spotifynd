@@ -127,6 +127,7 @@ angular.module('app.create', ['app.services','firebase', 'uiGmapgoogle-maps'])
   $scope.createMarker = function (activity) {
     var str = 'http://maps.google.com/maps/api/geocode/json?address=';
     console.log(activity);
+    var result = null;
     var arr = activity.address.split(',');
     for (var i=0; i<arr.length-1; i++) {
       var sub = arr[i].trim().split(' ');
@@ -138,7 +139,7 @@ angular.module('app.create', ['app.services','firebase', 'uiGmapgoogle-maps'])
 
     str+=arr[arr.length-1].slice(0,3)+"&sensor=false";
     console.log(str);
-    $http.get(str)
+    return $http.get(str)
     .then(function(results){
 
       // server calls a get request to the foursquare api
@@ -167,15 +168,20 @@ angular.module('app.create', ['app.services','firebase', 'uiGmapgoogle-maps'])
                 }
               }
       };
-      
+      $scope.checkbox = false;
       $scope.map = {center: {latitude: data.lat, longitude: data.lng }, zoom: 14 };
       $scope.markers.push(marker);
+      result = marker;
+      // console.log("((((((((((((");
+      // console.log($scope.markers);
       //$scope.$digest();
+      return result;
 
     })
     .catch(function(err){
       console.log("Error Getting Individual Trip Data: ", err)
     });
+    //return result;
   }
 
   $scope.removeFromTrip = function () {
@@ -235,14 +241,25 @@ angular.module('app.create', ['app.services','firebase', 'uiGmapgoogle-maps'])
     })
     $scope.messages = Fire.addMessage($scope.roomId)
     $scope.itinerary = Fire.addToPlaylist($scope.roomId);
-    console.log($scope.itinerary[1]);
+    console.log("..................");
     $scope.itinerary.$loaded()
       .then(function (itinerary) {
         if (itinerary.length>0) {
+          var arr = [];
           for (var i=0; i<itinerary.length; i++) {
             var act = itinerary[i];
-            $scope.createMarker(act);
+            $scope.createMarker(act)
+              .then(function(marker) {
+                arr.push(marker);
+                if (arr.length===itinerary.length) {
+                  $scope.markers = arr;
+                } 
+              });
+            //console.log("------------------");
+            
           }
+          //console.log($scope.markers);
+          //$scope.markers = arr;
         }
       })
       .catch(function (err) {
