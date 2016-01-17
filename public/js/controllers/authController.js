@@ -1,9 +1,39 @@
 angular.module('app.auth', ['app.services'])
 
 // Auth is a factory/service from app.services
-.controller('AuthController', function ($scope, $http, $location, Auth) {
+.controller('AuthController', function ($scope, $window, $http, $location, Auth) {
+  $scope.facebookLogin = false;
+  // if (!window.localStorage.EQUIP_TOKEN && facebookLogin) {
+  //   $http({
+  //     method: 'POST',
+  //     url: '/api/login',
+  //     data: {facebook: facebookLogin}
+  //   }).then( function (data) {
+  //     console.log(data, "dataaaaaaaaaaaaaaaaaaaa");
+  //     window.localStorage.setItem('EQUIP_TOKEN', data.data._id);
+  //     $location.path('#/room');
+  //     //facebookLogin = false;
+  //   });
+  // }
 
-  
+  $scope.fbLogin = function () {
+    console.log("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+    
+    if (!$window.localStorage.EQUIP_TOKEN && $scope.facebookLogin) {
+      $http({
+        method: 'POST',
+        url: '/api/login',
+        data: {facebook: $scope.facebookLogin}
+      }).then( function (data) {
+        console.log(data, "dataaaaaaaaaaaaaaaaaaaa");
+
+        $window.localStorage.setItem('EQUIP_TOKEN', data.data.id);
+        $location.path('#/room');
+        //facebookLogin = false;
+      });
+    }
+  } 
+
 
   $scope.signUp = function () { 
     var data = {
